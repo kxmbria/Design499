@@ -1,45 +1,64 @@
-# Personal Link Dashboard (New Tab Page)
+# Personal Link Dashboard (Astro + HTMX + Alpine + SQLite)
 
-A fast, clean dashboard you can use as a browser new-tab page.
+This project is a minimal new-tab dashboard for organizing links by category.
 
-## What this app does
-- Shows links grouped by category
-- Lets you add, edit, and delete links
-- Lets you create and delete categories
-- Stores data locally in SQLite (`dashboard.db`)
+## Minimum features included
+- Categories to organize links
+- Add a link with name and URL
+- Edit a link
+- Delete a link
+- Add and delete categories
+- Store data in SQLite
+- Run on localhost
 
-## Tech choices (beginner-friendly)
-- **Frontend:** Plain HTML, CSS, JavaScript
-- **Backend:** Python standard library (`http.server`)
-- **Database:** SQLite (built into Python)
+## Tech stack (recommended for your class)
+- **Astro** for project structure and local dev server
+- **HTMX** to refresh the dashboard list HTML
+- **Alpine.js** for simple form state (add/edit)
+- **JavaScript** for all client interactions
+- **SQLite** via `better-sqlite3` for local database storage
 
-No frameworks or external packages are required.
-
-## Project structure
-- `app.py` — server + API routes + SQLite setup
-- `templates/index.html` — main page markup
-- `static/styles.css` — styling
-- `static/app.js` — frontend behavior and API calls
-- `dashboard.db` — SQLite database file (created automatically on first run)
+## File structure (beginner-friendly)
+- `src/pages/index.astro`  
+  Main page UI (forms + dashboard container + Alpine/HTMX behavior).
+- `src/styles/global.css`  
+  Clean, minimal styles.
+- `src/lib/db.js`  
+  SQLite connection, table creation, and database helper functions.
+- `src/lib/renderDashboard.js`  
+  Converts category/link data into dashboard HTML cards.
+- `src/pages/api/dashboard.json.js`  
+  Returns categories/links as JSON.
+- `src/pages/api/dashboard-html.js`  
+  Returns ready-to-render dashboard HTML for HTMX.
+- `src/pages/api/categories/index.js`  
+  `POST` create category.
+- `src/pages/api/categories/[id]/index.js`  
+  `DELETE` category.
+- `src/pages/api/links/index.js`  
+  `POST` create link.
+- `src/pages/api/links/[id]/index.js`  
+  `PUT` update link, `DELETE` link.
+- `dashboard.db`  
+  SQLite file (auto-created when the app runs).
 
 ## Run locally
-1. Make sure you have Python 3.10+ installed.
-2. From this folder, run:
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start dev server:
+   ```bash
+   npm run dev
+   ```
+3. Open:
+   `http://127.0.0.1:4321`
 
-```bash
-python3 app.py
-```
-
-3. Open: `http://127.0.0.1:8000`
-
-## API endpoints
-- `GET /api/dashboard`
+## API routes
+- `GET /api/dashboard.json`
+- `GET /api/dashboard-html`
 - `POST /api/categories`
 - `DELETE /api/categories/:id`
 - `POST /api/links`
 - `PUT /api/links/:id`
 - `DELETE /api/links/:id`
-
-## Notes
-- Deleting a category also deletes links inside it (cascade delete).
-- The server binds to localhost only (`127.0.0.1`) for local use.
