@@ -25,6 +25,7 @@ button.ghost { background: #eef2ff; color: #312e81; }
 button.danger { background: var(--danger-bg); color: var(--danger-text); }
 .grid { display: grid; grid-template-columns: 1.2fr 2fr 1fr; gap: .6rem; }
 .inline-form { display: flex; gap: .6rem; }
+.form-actions { margin-top: .6rem; display: flex; gap: .5rem; }
 .dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: .8rem; }
 .category-card { padding: .8rem; }
 .category-head, .link-row { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }

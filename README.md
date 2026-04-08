@@ -1,53 +1,44 @@
-# Personal Link Dashboard (Astro + HTMX + Alpine + SQLite)
+# Personal Link Dashboard (Astro + JavaScript + SQLite)
 
-This project is a minimal new-tab dashboard for organizing links by category.
+A clean, minimal new-tab dashboard for managing personal links.
 
-## Minimum features included
+## Features (minimum requirements)
 - Categories to organize links
-- Add a link with name and URL
+- Add a link with name + URL
 - Edit a link
 - Delete a link
 - Add and delete categories
-- Store data in SQLite
-- Run on localhost
+- Persist data in SQLite
+- Run locally on localhost
 
-## Tech stack (recommended for your class)
-- **Astro** for project structure and local dev server
-- **HTMX** to refresh the dashboard list HTML
-- **Alpine.js** for simple form state (add/edit)
-- **JavaScript** for all client interactions
-- **SQLite** via `better-sqlite3` for local database storage
-
-## File structure (beginner-friendly)
+## Project structure
 - `src/pages/index.astro`  
-  Main page UI (forms + dashboard container + Alpine/HTMX behavior).
+  Main page layout (forms + dashboard containers).
+- `src/scripts/dashboard.js`  
+  Beginner-friendly frontend logic for loading data and handling add/edit/delete actions.
 - `src/styles/global.css`  
-  Clean, minimal styles.
+  Minimal styling.
 - `src/lib/db.js`  
-  SQLite connection, table creation, and database helper functions.
-- `src/lib/renderDashboard.js`  
-  Converts category/link data into dashboard HTML cards.
-- `src/pages/api/dashboard.json.js`  
-  Returns categories/links as JSON.
-- `src/pages/api/dashboard-html.js`  
-  Returns ready-to-render dashboard HTML for HTMX.
+  SQLite connection and CRUD helper functions.
 - `src/pages/api/categories/index.js`  
-  `POST` create category.
+  `POST /api/categories` (create category).
 - `src/pages/api/categories/[id]/index.js`  
-  `DELETE` category.
+  `DELETE /api/categories/:id`.
 - `src/pages/api/links/index.js`  
-  `POST` create link.
+  `POST /api/links` (create link).
 - `src/pages/api/links/[id]/index.js`  
-  `PUT` update link, `DELETE` link.
+  `PUT /api/links/:id` and `DELETE /api/links/:id`.
+- `src/pages/api/dashboard.json.js`  
+  `GET /api/dashboard.json` (categories and links grouped together).
 - `dashboard.db`  
-  SQLite file (auto-created when the app runs).
+  Local SQLite database file (auto-created).
 
-## Run locally
+## Run locally (Codespaces or local machine)
 1. Install dependencies:
    ```bash
    npm install
    ```
-2. Start dev server:
+2. Start the app:
    ```bash
    npm run dev
    ```
@@ -56,7 +47,6 @@ This project is a minimal new-tab dashboard for organizing links by category.
 
 ## API routes
 - `GET /api/dashboard.json`
-- `GET /api/dashboard-html`
 - `POST /api/categories`
 - `DELETE /api/categories/:id`
 - `POST /api/links`

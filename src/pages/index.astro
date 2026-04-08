@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../scripts/dashboard.js';
 ---
 
 <html lang="en">
@@ -7,166 +8,34 @@ import '../styles/global.css';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>My Link Dashboard</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   </head>
-  <body x-data="dashboardApp()">
+  <body>
     <main class="container">
       <header class="topbar">
         <h1>My Links</h1>
-        <form class="inline-form" @submit.prevent="createCategory">
-          <input x-model="categoryName" type="text" placeholder="New category" required maxlength="40" />
+        <form id="category-form" class="inline-form">
+          <input id="category-name" type="text" placeholder="New category" required maxlength="40" />
           <button type="submit">Add Category</button>
         </form>
       </header>
 
       <section class="panel">
-        <h2 x-text="editingId ? 'Edit Link' : 'Add Link'"></h2>
-        <form @submit.prevent="saveLink">
+        <h2 id="form-title">Add Link</h2>
+        <form id="link-form">
           <div class="grid">
-            <input x-model="linkName" type="text" placeholder="Name" required maxlength="80" />
-            <input x-model="linkUrl" type="url" placeholder="https://example.com" required />
-            <select x-model.number="linkCategory" required>
-              <template x-for="category in categories" :key="category.id">
-                <option :value="category.id" x-text="category.name"></option>
-              </template>
-            </select>
+            <input id="link-name" type="text" placeholder="Name" required maxlength="80" />
+            <input id="link-url" type="url" placeholder="https://example.com" required />
+            <select id="link-category" required></select>
           </div>
-          <div style="margin-top: .6rem; display:flex; gap:.5rem;">
-            <button type="submit" x-text="editingId ? 'Update Link' : 'Save Link'"></button>
-            <button type="button" class="ghost" x-show="editingId" @click="cancelEdit">Cancel</button>
+          <div class="form-actions">
+            <button type="submit" id="save-button">Save Link</button>
+            <button type="button" id="cancel-edit" class="ghost" hidden>Cancel</button>
           </div>
         </form>
       </section>
 
-      <p id="message" x-text="message" :style="error ? 'color:#b91c1c' : ''"></p>
-
-      <section
-        id="dashboard"
-        class="dashboard"
-        hx-get="/api/dashboard-html"
-        hx-trigger="load, refreshDashboard from:body"
-        hx-swap="innerHTML"
-      ></section>
+      <p id="message" aria-live="polite"></p>
+      <section id="dashboard" class="dashboard"></section>
     </main>
-
-    <script>
-      window.startEdit = (link, categoryId) => {
-        document.body.dispatchEvent(new CustomEvent('start-edit', { detail: { link, categoryId } }));
-      };
-
-      window.deleteCategory = async (id) => {
-        const response = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (!response.ok) return alert(data.error || 'Failed to delete category.');
-        document.body.dispatchEvent(new Event('refreshDashboard'));
-        document.body.dispatchEvent(new Event('reload-categories'));
-      };
-
-      window.deleteLink = async (id) => {
-        const response = await fetch(`/api/links/${id}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (!response.ok) return alert(data.error || 'Failed to delete link.');
-        document.body.dispatchEvent(new Event('refreshDashboard'));
-        document.body.dispatchEvent(new Event('reload-categories'));
-      };
-
-      function dashboardApp() {
-        return {
-          categories: [],
-          categoryName: '',
-          linkName: '',
-          linkUrl: '',
-          linkCategory: null,
-          editingId: null,
-          message: '',
-          error: false,
-
-          async init() {
-            await this.loadCategories();
-
-            document.body.addEventListener('reload-categories', () => this.loadCategories());
-            document.body.addEventListener('start-edit', (event) => {
-              const { link, categoryId } = event.detail;
-              this.editingId = link.id;
-              this.linkName = link.name;
-              this.linkUrl = link.url;
-              this.linkCategory = categoryId;
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-          },
-
-          setMessage(text, isError = false) {
-            this.message = text;
-            this.error = isError;
-          },
-
-          async loadCategories() {
-            const response = await fetch('/api/dashboard.json');
-            this.categories = await response.json();
-            if (!this.linkCategory && this.categories.length) {
-              this.linkCategory = this.categories[0].id;
-            }
-          },
-
-          async createCategory() {
-            const response = await fetch('/api/categories', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: this.categoryName })
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-              this.setMessage(data.error || 'Could not add category.', true);
-              return;
-            }
-
-            this.categoryName = '';
-            this.setMessage('Category added.');
-            await this.loadCategories();
-            document.body.dispatchEvent(new Event('refreshDashboard'));
-          },
-
-          async saveLink() {
-            const payload = {
-              name: this.linkName,
-              url: this.linkUrl,
-              category_id: this.linkCategory
-            };
-
-            const endpoint = this.editingId ? `/api/links/${this.editingId}` : '/api/links';
-            const method = this.editingId ? 'PUT' : 'POST';
-
-            const response = await fetch(endpoint, {
-              method,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-              this.setMessage(data.error || 'Could not save link.', true);
-              return;
-            }
-
-            const wasEditing = Boolean(this.editingId);
-            this.cancelEdit();
-            this.setMessage(wasEditing ? 'Link updated.' : 'Link added.');
-            await this.loadCategories();
-            document.body.dispatchEvent(new Event('refreshDashboard'));
-          },
-
-          cancelEdit() {
-            this.editingId = null;
-            this.linkName = '';
-            this.linkUrl = '';
-            if (this.categories.length) {
-              this.linkCategory = this.categories[0].id;
-            }
-          }
-        };
-      }
-    </script>
   </body>
 </html>
