@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import '../scripts/dashboard.js';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>My Link Dashboard</title>
+  </head>
+  <body>
+    <main class="container">
+      <header class="topbar">
+        <h1>My Links</h1>
+        <form id="category-form" class="inline-form">
+          <input id="category-name" type="text" placeholder="New category" required maxlength="40" />
+          <button type="submit">Add Category</button>
+        </form>
+      </header>
+
+      <section class="panel">
+        <h2 id="form-title">Add Link</h2>
+        <form id="link-form">
+          <div class="grid">
+            <input id="link-name" type="text" placeholder="Name" required maxlength="80" />
+            <input id="link-url" type="url" placeholder="https://example.com" required />
+            <select id="link-category" required></select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="save-button">Save Link</button>
+            <button type="button" id="cancel-edit" class="ghost" hidden>Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <p id="message" aria-live="polite"></p>
+      <section id="dashboard" class="dashboard"></section>
+    </main>
+  </body>
+</html>
